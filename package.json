@@ -1,0 +1,16 @@
+{
+  "name": "benito",
+  "version": "1.0.0",
+  "description": "Bot de Twitch con ChatGPT",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "better-sqlite3": "^12.6.2",
+    "dotenv": "^17.2.4",
+    "openai": "^6.19.0",
+    "tmi.js": "^1.8.5"
+  }
+}
