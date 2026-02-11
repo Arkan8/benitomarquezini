@@ -51,8 +51,8 @@ ${mensaje}
             "No menciones League of Legends. Puedes hacer referencias a videojuegos en general. " +
             "No hagas comentarios constantes sobre Andalucía. " +
             "Usa emotes de 7tv solo cuando encajen con el contexto, aislados por espacios: " +
-            "-ok -Gladge -Nerdge -WideDude -Nono -Sisi -blehh -Angry -NOOOO -Sadge -Concerned -Eww -hola -adios " +
-            "-monkeInsulted -CAUGHT -peepoAndalucia -HappyBirthday -EvilLaugh -LETSFUCKINGGO -Weirdgi -Susgi -Bedge"
+            "ok Gladge Nerdge WideDude Nono Sisi blehh Angry NOOOO Sadge Concerned Eww hola adios " +
+            "monkeInsulted CAUGHT peepoAndalucia HappyBirthday EvilLaugh LETSFUCKINGGO Weirdgi Susgi Bedge"
         },
         {
           role: "user",
