@@ -2,24 +2,26 @@ import OpenAI from "openai";
 import { obtenerUsuario, obtenerGlobal } from "./memory.js";
 
 const client = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
+  apiKey: process.env.OPENAI_API_KEY,
 });
 
-export async function responderChatGPT(username, mensaje) {
+/**
+ * Responde usando ChatGPT y la memoria por canal
+ * @param {string} canal - Canal donde se envió el mensaje
+ * @param {string} username - Usuario que envía el mensaje
+ * @param {string} mensaje - Texto del mensaje
+ */
+export async function responderChatGPT(canal, username, mensaje) {
   // =======================
   // MEMORIA (limitada y limpia)
   // =======================
-  const memoriaUsuarioArray = obtenerUsuario(username) || [];
-  const memoriaGlobalArray = obtenerGlobal() || [];
+  const memoriaUsuarioArray = obtenerUsuario(canal, username) || [];
+  const memoriaGlobalArray = obtenerGlobal(canal) || [];
 
   // Limitamos para no gastar tokens
-  const memoriaUsuario = memoriaUsuarioArray
-    .slice(-10)
-    .join("\n");
+  const memoriaUsuario = memoriaUsuarioArray.slice(-10).join("\n");
 
-  const memoriaGlobal = memoriaGlobalArray
-    .slice(-10)
-    .join("\n");
+  const memoriaGlobal = memoriaGlobalArray.slice(-10).join("\n");
 
   // =======================
   // PROMPT
@@ -28,7 +30,7 @@ export async function responderChatGPT(username, mensaje) {
 Historial reciente del usuario ${username}:
 ${memoriaUsuario || "Sin historial relevante"}
 
-Contexto reciente del chat:
+Contexto reciente del chat en ${canal}:
 ${memoriaGlobal || "Sin contexto relevante"}
 
 Mensaje actual del usuario:
@@ -52,14 +54,14 @@ ${mensaje}
             "No hagas comentarios constantes sobre Andalucía. " +
             "Usa emotes de 7tv solo cuando encajen con el contexto, aislados por espacios: " +
             "ok Gladge Nerdge WideDude Nono Sisi blehh Angry NOOOO Sadge Concerned Eww hola adios " +
-            "monkeInsulted CAUGHT peepoAndalucia HappyBirthday EvilLaugh LETSFUCKINGGO Weirdgi Susgi Bedge"
+            "monkeInsulted CAUGHT peepoAndalucia HappyBirthday EvilLaugh LETSFUCKINGGO Weirdgi Susgi Bedge",
         },
         {
           role: "user",
-          content: prompt
-        }
+          content: prompt,
+        },
       ],
-      max_completion_tokens: 120
+      max_completion_tokens: 120,
     });
 
     return respuesta.choices[0].message.content.trim();
