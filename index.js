@@ -1,30 +1,57 @@
 import tmi from "tmi.js";
 import "dotenv/config";
-import { tienePermiso } from "./permissions.js";
-import { guardarMensaje } from "./memory.js";
-import { responderChatGPT } from "./chatgpt.js";
 
+import { tienePermiso } from "./permissions.js";
+import { responderChatGPT } from "./chatgpt.js";
+import { guardarMensaje, memoriaUsuarios } from "./memory.js";
+
+// =======================
+// CONFIGURACIÓN DEL CLIENTE
+// =======================
 const client = new tmi.Client({
-  connection: { secure: true, reconnect: true },
-  identity: { username: process.env.BOT_USERNAME, password: process.env.BOT_OAUTH },
+  connection: {
+    secure: true,
+    reconnect: true
+  },
+  identity: {
+    username: process.env.BOT_USERNAME,
+    password: process.env.BOT_OAUTH
+  },
   channels: [process.env.CHANNEL]
 });
 
 client.connect();
 
+// =======================
+// EVENTO MENSAJES
+// =======================
 client.on("message", async (channel, tags, message, self) => {
   if (self) return;
+
+  const usuario = tags.username;
+  const textoOriginal = message.trim();
+
+  // 1️⃣ FASE PASIVA → LEER TODO EL CHAT
+  guardarMensaje(usuario, textoOriginal);
+
+  // 2️⃣ SOLO RESPONDER SI:
+  // - Tiene permisos
+  // - Empieza por "Benito,"
   if (!tienePermiso(tags)) return;
-  if (!message.toLowerCase().startsWith("benito,")) return;
+  if (!textoOriginal.toLowerCase().startsWith("benito,")) return;
 
-  const texto = message.replace(/^benito,\s*/i, "");
+  // Quitamos el activador
+  const texto = textoOriginal.replace(/^benito,\s*/i, "");
 
-  // Guardar en memoria
-  guardarMensaje(tags.username, texto);
+  try {
+    // 3️⃣ RESPUESTA CON CHATGPT (usando memoria)
+    const respuesta = await responderChatGPT(usuario, texto);
 
-  // Obtener respuesta de ChatGPT
-  const respuesta = await responderChatGPT(tags.username, texto);
-
-  // Enviar mensaje al chat
-  client.say(channel, `@${tags.username} ${respuesta}`);
+    if (respuesta) {
+      client.say(channel, `@${usuario} ${respuesta}`);
+    }
+  } catch (error) {
+    console.error("Error al responder:", error);
+    client.say(channel, `@${usuario} he tenido un problema pensando 🤖`);
+  }
 });

@@ -1,25 +1,51 @@
-import { db } from "./db.js";
+// memory.js
 
-export function guardarMensaje(username, texto) {
-  // Guardar en memoria global
-  db.prepare("INSERT INTO global_memory (username, message) VALUES (?, ?)").run(username, texto);
+// =======================
+// MEMORIA GLOBAL
+// =======================
+export const memoriaGlobal = {
+  ultimosMensajes: []
+};
+
+// =======================
+// MEMORIA POR USUARIO
+// =======================
+export const memoriaUsuarios = new Map();
+
+// =======================
+// GUARDAR MENSAJE
+// =======================
+export function guardarMensaje(usuario, mensaje) {
+  // Guardar en memoria global (texto plano)
+  memoriaGlobal.ultimosMensajes.push(`${usuario}: ${mensaje}`);
+
+  if (memoriaGlobal.ultimosMensajes.length > 50) {
+    memoriaGlobal.ultimosMensajes.shift();
+  }
 
   // Guardar en memoria por usuario
-  db.prepare("INSERT INTO user_memory (username, message) VALUES (?, ?)").run(username, texto);
+  if (!memoriaUsuarios.has(usuario)) {
+    memoriaUsuarios.set(usuario, []);
+  }
+
+  const historialUsuario = memoriaUsuarios.get(usuario);
+  historialUsuario.push(mensaje);
+
+  if (historialUsuario.length > 20) {
+    historialUsuario.shift();
+  }
 }
 
-// Recuperar últimos N mensajes de un usuario
-export function obtenerUsuario(username, limit = 10) {
-  return db.prepare("SELECT message FROM user_memory WHERE username=? ORDER BY id DESC LIMIT ?")
-    .all(username, limit)
-    .map(r => r.message)
-    .reverse();
+// =======================
+// OBTENER MEMORIA USUARIO
+// =======================
+export function obtenerUsuario(usuario) {
+  return memoriaUsuarios.get(usuario) || [];
 }
 
-// Recuperar últimos N mensajes globales
-export function obtenerGlobal(limit = 20) {
-  return db.prepare("SELECT message FROM global_memory ORDER BY id DESC LIMIT ?")
-    .all(limit)
-    .map(r => r.message)
-    .reverse();
+// =======================
+// OBTENER MEMORIA GLOBAL
+// =======================
+export function obtenerGlobal() {
+  return memoriaGlobal.ultimosMensajes || [];
 }
