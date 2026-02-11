@@ -20,7 +20,9 @@ const client = new tmi.Client({
   channels: [process.env.CHANNEL]
 });
 
-client.connect();
+client.connect()
+  .then(() => console.log("Bot conectado a Twitch correctamente"))
+  .catch(err => console.error("Error al conectar a Twitch:", err));
 
 // =======================
 // EVENTO MENSAJES
@@ -40,18 +42,35 @@ client.on("message", async (channel, tags, message, self) => {
   if (!tienePermiso(tags)) return;
   if (!textoOriginal.toLowerCase().startsWith("benito,")) return;
 
+<<<<<<< HEAD
   // Quitamos el activador
   const texto = textoOriginal.replace(/^benito,\s*/i, "");
+=======
+  console.log(`Mensaje de ${tags.username}: ${message}`);
+  const texto = message.replace(/^benito,\s*/i, "");
+>>>>>>> f8f44be (Add logging to track bot connections and message processing)
 
   try {
     // 3️⃣ RESPUESTA CON CHATGPT (usando memoria)
     const respuesta = await responderChatGPT(usuario, texto);
 
+<<<<<<< HEAD
     if (respuesta) {
       client.say(channel, `@${usuario} ${respuesta}`);
     }
   } catch (error) {
     console.error("Error al responder:", error);
     client.say(channel, `@${usuario} he tenido un problema pensando 🤖`);
+=======
+  try {
+    // Obtener respuesta de ChatGPT
+    const respuesta = await responderChatGPT(tags.username, texto);
+    console.log(`Respuesta de Benito: ${respuesta}`);
+
+    // Enviar mensaje al chat
+    client.say(channel, `@${tags.username} ${respuesta}`);
+  } catch (error) {
+    console.error("Error al procesar mensaje con ChatGPT:", error);
+>>>>>>> f8f44be (Add logging to track bot connections and message processing)
   }
 });
