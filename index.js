@@ -3,12 +3,6 @@ import "dotenv/config";
 import { tienePermiso } from "./permissions.js";
 import { guardarMensaje } from "./memory.js";
 import { responderChatGPT } from "./chatgpt.js";
-import express from "express";
-const app = express();
-
-const PORT = process.env.PORT || 3000;
-app.get("/", (req, res) => res.send("Bot activo y conectado a Twitch"));
-app.listen(PORT, () => console.log(`Servidor web escuchando en puerto ${PORT}`));
 
 const client = new tmi.Client({
   connection: { secure: true, reconnect: true },
