@@ -22,13 +22,22 @@ args = "Benito Bot"
 name = "Benito Bot"
 author = "agent"
 
+[workflows.workflow.metadata]
+outputType = "webview"
+
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "cd /home/runner/workspace && node index.js"
-
-[workflows.workflow.metadata]
-outputType = "console"
+waitForPort = 5000
 
 [deployment]
 deploymentTarget = "vm"
 run = ["node", "index.js"]
+
+[[ports]]
+localPort = 3000
+externalPort = 80
+
+[[ports]]
+localPort = 5000
+externalPort = 80

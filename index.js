@@ -1,3 +1,4 @@
+import express from "express";
 import tmi from "tmi.js";
 import "dotenv/config";
 
@@ -7,9 +8,23 @@ import { guardarMensaje } from "./memory.js";
 import fetch from "node-fetch";
 
 // =======================
+// SERVIDOR WEB (EXPRESS)
+// =======================
+const app = express();
+const PORT = process.env.PORT || 5000;
+
+app.get("/", (req, res) => {
+  res.status(200).send("Benito está despierto 😈 y en funcionamiento 🤖");
+});
+
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`Servidor web activo en el puerto ${PORT}`);
+});
+
+// =======================
 // CONFIGURACIÓN DEL CLIENTE
 // =======================
-const canales = process.env.CHANNELS.split(",").map((c) => c.trim());
+const canales = (process.env.CHANNELS || process.env.CHANNEL || "").split(",").map((c) => c.trim());
 
 const client = new tmi.Client({
   connection: { secure: true, reconnect: true },
