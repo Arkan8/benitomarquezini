@@ -93,14 +93,15 @@ async function obtenerCooldown(canal) {
 client.on("message", async (channel, tags, message, self) => {
   if (self) return;
 
+  const canalLimpio = channel.replace("#", "");
   const usuario = tags.username;
   const textoOriginal = message.trim();
 
   // 1️⃣ FASE PASIVA → LEER TODO EL CHAT (memoria por canal)
-  guardarMensaje(channel, usuario, textoOriginal);
+  guardarMensaje(canalLimpio, usuario, textoOriginal);
 
   // 2️⃣ COOLDOWN por usuario y canal
-  if (!(await puedeHablar(usuario, channel))) return;
+  if (!(await puedeHablar(usuario, canalLimpio))) return;
 
   // 3️⃣ SOLO RESPONDER SI tiene permisos y activador "Benito,"
   if (!tienePermiso(tags)) return;
@@ -110,7 +111,7 @@ client.on("message", async (channel, tags, message, self) => {
 
   try {
     // 4️⃣ RESPUESTA CON CHATGPT (memoria por canal)
-    const respuesta = await responderChatGPT(channel, usuario, texto);
+    const respuesta = await responderChatGPT(canalLimpio, usuario, texto);
 
     if (respuesta) {
       client.say(channel, `@${usuario} ${respuesta}`);
